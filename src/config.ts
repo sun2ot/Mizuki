@@ -597,17 +597,12 @@ export const pioConfig: import("./types/config").PioConfig = {
 	mode: "draggable", // 默认为可拖拽模式
 	hiddenOnMobile: true, // 默认在移动设备上隐藏
 	dialog: {
-		welcome: "Welcome to Mizuki Website!", // 欢迎词
-		touch: [
-			"What are you doing?",
-			"Stop touching me!",
-			"HENTAI!",
-			"Don't bully me like that!",
-		], // 触摸提示
-		home: "Click here to go back to homepage!", // 首页提示
-		skin: ["Want to see my new outfit?", "The new outfit looks great~"], // 换装提示
-		close: "QWQ See you next time~", // 关闭提示
-		link: "https://github.com/matsuzaka-yuki/Mizuki", // 关于链接
+		welcome: "欢迎光临!", // 欢迎词
+		touch: ["李在赣神魔？", "别摸我啦！", "HENTAI!", "不要这样欺负我！"], // 触摸提示
+		home: "点击这里返回首页", // 首页提示
+		skin: ["想看看我的新装吗？", "新装看起来很棒~"], // 换装提示
+		close: "QWQ 下次见~", // 关闭提示
+		link: "https://github.com/sun2ot", // 关于链接
 	},
 };
 
