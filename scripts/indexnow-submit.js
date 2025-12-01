@@ -1,9 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadEnv } from "./load-env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+loadEnv();
 
 // 从 sitemap 文件中解析 URL 列表
 function parseSitemap(sitemapPath) {
@@ -41,10 +44,15 @@ async function submitToIndexNow(urls) {
 		urlChunks.push(urls.slice(i, i + MAX_URLS_PER_REQUEST));
 	}
 
-	const apiKey = "a2d14d5b21144509b381a3735e586a60";
-	const keyLocation =
-		"https://blog.085404.xyz/a2d14d5b21144509b381a3735e586a60.txt";
-	const host = "blog.085404.xyz";
+	const apiKey = process.env.INDEXNOW_KEY;
+	const host = process.env.INDEXNOW_HOST;
+	const keyLocation = `https://${host}/${apiKey}.txt`;
+
+	if (!apiKey || !host) {
+		console.error("❌ 缺少必要的环境变量: INDEXNOW_KEY 或 INDEXNOW_HOST");
+		console.error("   请在 .env 文件中配置这些变量");
+		return;
+	}
 
 	for (let i = 0; i < urlChunks.length; i++) {
 		const chunk = urlChunks[i];
@@ -128,11 +136,10 @@ async function main() {
 		}
 
 		// 过滤出有效的 URL（以指定主机开头的）
-		const host = "blog.085404.xyz";
+		const host = process.env.INDEXNOW_HOST;
 		const filteredUrls = urls.filter(
 			(url) =>
-				url.startsWith("https://blog.085404.xyz/") ||
-				url.startsWith("http://blog.085404.xyz/"),
+				url.startsWith(`https://${host}/`) || url.startsWith(`http://${host}/`),
 		);
 
 		console.log(`✓ 过滤后剩余 ${filteredUrls.length} 个有效 URL`);
