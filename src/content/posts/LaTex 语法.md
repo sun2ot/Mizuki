@@ -1,9 +1,8 @@
 ---
 title: LaTex 语法
 published: 2024-11-06
-# updated: 2025-07-01 11:36:31
-# categories: None
-# katex: True
+category: 教程
+tags: [科研]
 ---
 > [!tip]
 > 如果你有过 markdown 的写作经历，上手 LaTeX 会特别快
@@ -168,10 +167,10 @@ From Tab.1, we can draw some conclusion:
 
 这个表格渲染的效果类似于：
 
-|列 1|列 2|列 3|
-|-|-|-|
-|数据 1|数据 2|数据 3|
-|数据 4|数据 5|数据 6|
+| 列 1   | 列 2   | 列 3   |
+| ------ | ------ | ------ |
+| 数据 1 | 数据 2 | 数据 3 |
+| 数据 4 | 数据 5 | 数据 6 |
 
 首先看到 `\begin{tabular}` 后面的几个 c：
 1. 这里的 c 表示 center，即居中。类似地，左对齐用 l (left)，右对齐用 r (right)

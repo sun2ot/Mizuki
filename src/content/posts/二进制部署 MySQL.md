@@ -1,6 +1,8 @@
 ---
 title: 二进制部署 MySQL
 published: 2025-04-30
+category: 教程
+tags: [运维, SQL]
 # updated: 2025-04-30 15:45:44
 ---
 
