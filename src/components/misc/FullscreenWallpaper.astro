@@ -1,7 +1,7 @@
 ---
-// import { Image } from "astro:assets";
 import { siteConfig } from "../../config";
 import type { FullscreenWallpaperConfig } from "../../types/config";
+import { processImageSource, toArray } from "../../utils/image-selector";
 
 interface Props {
 	config: FullscreenWallpaperConfig;
@@ -9,6 +9,8 @@ interface Props {
 }
 
 const { config, className } = Astro.props;
+
+const isCarouselEnabled = config.carousel?.enable ?? false;
 
 // 获取当前设备类型的图片源
 const getImageSources = async () => {
@@ -22,7 +24,6 @@ const getImageSources = async () => {
 			const apiImages = text.split("\n").filter((line) => line.trim());
 
 			if (apiImages.length > 0) {
-				// 将API图片同时用于桌面端和移动端
 				return {
 					desktop: apiImages,
 					mobile: apiImages,
@@ -33,11 +34,6 @@ const getImageSources = async () => {
 		}
 	}
 
-	const toArray = (src: string | string[] | undefined): string[] => {
-		if (Array.isArray(src)) return src;
-		if (typeof src === "string") return [src];
-		return [];
-	};
 	if (
 		typeof srcConfig === "object" &&
 		srcConfig !== null &&
@@ -48,18 +44,31 @@ const getImageSources = async () => {
 			desktop?: string | string[];
 			mobile?: string | string[];
 		};
-		const desktop = toArray(srcObj.desktop);
-		const mobile = toArray(srcObj.mobile);
+
+		const desktopImages = toArray(srcObj.desktop);
+		const mobileImages = toArray(srcObj.mobile);
+
+		const processedDesktop = isCarouselEnabled
+			? desktopImages
+			: toArray(processImageSource(desktopImages, isCarouselEnabled));
+		const processedMobile = isCarouselEnabled
+			? mobileImages
+			: toArray(processImageSource(mobileImages, isCarouselEnabled));
+
 		return {
-			desktop: desktop.length > 0 ? desktop : mobile,
-			mobile: mobile.length > 0 ? mobile : desktop,
+			desktop: processedDesktop.length > 0 ? processedDesktop : processedMobile,
+			mobile: processedMobile.length > 0 ? processedMobile : processedDesktop,
 		};
 	}
-	// 如果是字符串或字符串数组，同时用于桌面端和移动端
+
 	const allImages = toArray(srcConfig as string | string[]);
+	const processed = isCarouselEnabled
+		? allImages
+		: toArray(processImageSource(allImages, isCarouselEnabled));
+
 	return {
-		desktop: allImages,
-		mobile: allImages,
+		desktop: processed,
+		mobile: processed,
 	};
 };
 
@@ -72,10 +81,9 @@ if (!hasDesktopImages && !hasMobileImages) {
 	return null;
 }
 
-// 轮播相关逻辑
-const isCarouselEnabled =
-	config.carousel?.enable &&
-	(imageSources.desktop.length > 1 || imageSources.mobile.length > 1);
+const hasMultipleImages =
+	imageSources.desktop.length > 1 || imageSources.mobile.length > 1;
+const shouldShowCarousel = isCarouselEnabled && hasMultipleImages;
 const carouselInterval = config.carousel?.interval || 5;
 
 // 样式相关
@@ -117,74 +125,62 @@ const positionClass = getPositionClass(position);
 	}
 })();
 </script>
-	<!-- 桌面端壁纸 -->
-	{hasDesktopImages && (
-		<div class="hidden lg:block w-full h-full relative">
-			{imageSources.desktop.map((src, index) => {
-				const isLocal = !src.startsWith("http");
-				const imageClass = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}`;
-				
-				if (isLocal) {
-					// 对于本地图片，使用img标签而不是Image组件
-					return (
-						<img
-							src={src}
-							alt={`Desktop wallpaper ${index + 1}`}
-							class={imageClass}
-							data-carousel-item={isCarouselEnabled ? index : undefined}
-							style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
-						/>
-					);
-				} else {
-					return (
-						<img
-							src={src}
-							alt={`Desktop wallpaper ${index + 1}`}
-							class={imageClass}
-							data-carousel-item={isCarouselEnabled ? index : undefined}
-							style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
-						/>
-					);
-				}
-			})}
-		</div>
-	)}
+	{shouldShowCarousel ? (
+		<>
+			<!-- 桌面端壁纸 -->
+			{hasDesktopImages && (
+				<div class="hidden lg:block w-full h-full relative">
+					{imageSources.desktop.map((src, index) => {
+						const imageClass = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}`;
+						return (
+							<img
+								src={src}
+								alt={`Desktop wallpaper ${index + 1}`}
+								class={imageClass}
+								data-carousel-item={index}
+								style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+							/>
+						);
+					})}
+				</div>
+			)}
 
-	<!-- 移动端壁纸 -->
-	{hasMobileImages && (
-		<div class="block lg:hidden w-full h-full relative">
-			{imageSources.mobile.map((src, index) => {
-				const isLocal = !src.startsWith("http");
-				const imageClass = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}`;
-				
-				if (isLocal) {
-					// 对于本地图片，使用img标签而不是Image组件
-					return (
-						<img
-							src={src}
-							alt={`Mobile wallpaper ${index + 1}`}
-							class={imageClass}
-							data-carousel-item={isCarouselEnabled ? index : undefined}
-							style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
-						/>
-					);
-				} else {
-					return (
-						<img
-							src={src}
-							alt={`Mobile wallpaper ${index + 1}`}
-							class={imageClass}
-							data-carousel-item={isCarouselEnabled ? index : undefined}
-							style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
-						/>
-					);
-				}
-			})}
-		</div>
+			<!-- 移动端壁纸 -->
+			{hasMobileImages && (
+				<div class="block lg:hidden w-full h-full relative">
+					{imageSources.mobile.map((src, index) => {
+						const imageClass = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}`;
+						return (
+							<img
+								src={src}
+								alt={`Mobile wallpaper ${index + 1}`}
+								class={imageClass}
+								data-carousel-item={index}
+								style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+							/>
+						);
+					})}
+				</div>
+			)}
+		</>
+	) : (
+		<!-- 单图模式：使用 picture 元素避免加载两张图片 -->
+		<picture class="w-full h-full">
+			<source 
+				media="(max-width: 1023px)" 
+				srcset={imageSources.mobile.length > 0 ? imageSources.mobile[0] : imageSources.desktop[0]}
+			/>
+			<img 
+				src={imageSources.desktop.length > 0 ? imageSources.desktop[0] : imageSources.mobile[0]}
+				alt="Fullscreen wallpaper"
+				class={`w-full h-full object-cover ${positionClass}`}
+				style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+			/>
+		</picture>
 	)}
 </div>
 
-{isCarouselEnabled && (
+{shouldShowCarousel && (
 	<script is:inline define:vars={{ carouselInterval }}>
 		// 全屏壁纸轮播逻辑
 		function initFullscreenWallpaperCarousel() {
