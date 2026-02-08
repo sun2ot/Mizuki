@@ -2,9 +2,11 @@ name: Fuwari-yCENzh CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
+  repository_dispatch:
+    types: [content-update]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 concurrency:
