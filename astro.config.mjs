@@ -21,6 +21,7 @@ import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badg
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
 import { rehypeMermaid } from "./src/plugins/rehype-mermaid.mjs";
+import { remarkGithubAdmonitionsCaseInsensitive } from "./src/plugins/remark-github-admonitions-case-insensitive.mjs";
 import { rehypeWrapTable } from "./src/plugins/rehype-wrap-table.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
@@ -119,6 +120,7 @@ export default defineConfig({
 		remarkPlugins: [
 			remarkMath,
 			remarkContent,
+			remarkGithubAdmonitionsCaseInsensitive,
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
 			remarkSectionize,
