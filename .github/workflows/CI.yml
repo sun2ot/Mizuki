@@ -19,6 +19,7 @@ permissions:
 
 jobs:
   trigger-edgeone:
+    if: github.event_name == 'repository_dispatch'
     name: Trigger EdgeOne Pages Deploy
     runs-on: ubuntu-latest
     steps:
