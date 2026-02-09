@@ -3,11 +3,12 @@ name: Fuwari-yCENzh CI
 on:
   push:
     branches: [master]
-  repository_dispatch:
-    types: [content-update]
   pull_request:
     branches: [master]
   workflow_dispatch:
+  # --- 响应内容仓库的触发 ---
+  repository_dispatch:
+    types: [content-update]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,52 +18,59 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: Astro Check
+  trigger-edgeone:
+    name: Trigger EdgeOne Pages Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - name: Send POST to EdgeOne Webhook
+        run: 'curl -X POST -H "Content-Type: application/json" "${{ secrets.EDGEONE_WEBHOOK_URL }}"'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
+  # check:
+  #   name: Astro Check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v6
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v6
+  #       with:
+  #         node-version: lts/*
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         run_install: false
 
-      - name: Run Astro Check
-        run: pnpm astro check
-        env:
-          ENABLE_CONTENT_SYNC: false
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-  build:
-    name: Astro Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+  #     - name: Run Astro Check
+  #       run: pnpm astro check
+  #       env:
+  #         ENABLE_CONTENT_SYNC: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
+  # build:
+  #   name: Astro Build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v6
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v6
+  #       with:
+  #         node-version: lts/*
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         run_install: false
 
-      - name: Run Astro Build
-        run: pnpm astro build
-        env:
-          ENABLE_CONTENT_SYNC: false
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     - name: Run Astro Build
+  #       run: pnpm astro build
+  #       env:
+  #         ENABLE_CONTENT_SYNC: false
