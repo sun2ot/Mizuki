@@ -331,6 +331,7 @@ export type MusicPlayerConfig = {
 	id: string; // 歌单ID
 	server: string; // 音乐源服务器
 	type: string; // 音乐类型
+	auto: boolean; // 是否自动播放
 };
 
 export type FooterConfig = {
