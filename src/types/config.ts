@@ -463,3 +463,14 @@ export type PioConfig = {
 export type ShareConfig = {
 	enable: boolean; // 是否启用分享功能
 };
+
+/**
+ * 不蒜子访问统计配置
+ */
+export type BusuanziConfig = {
+	enable: boolean; // 是否启用不蒜子统计
+	jsUrl: string; // 自建不蒜子JS地址（如 https://bsz.085404.xyz/js）
+	siteUrl: string; // 站点URL，用于统计识别（如 blog.085404.xyz）
+	showInSiteStats: boolean; // 是否在站点统计组件中显示
+	showInProfile: boolean; // 是否在个人资料组件中显示
+};

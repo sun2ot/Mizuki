@@ -3,6 +3,7 @@ import ConfigCarrier from "@components/ConfigCarrier.astro";
 import MusicPlayer from "@components/widget/MusicPlayer.svelte";
 import Pio from "@components/widget/Pio.svelte"; // 使用 Svelte 版本的 Pio 组件
 import {
+	busuanziConfig,
 	musicPlayerConfig,
 	pioConfig,
 	profileConfig,
@@ -129,6 +130,11 @@ const bannerOffset =
 
 const umamiEnabled = umamiConfig.enabled || false;
 const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
+
+// 不蒜子统计配置
+const busuanziEnabled = busuanziConfig.enable || false;
+const busuanziJsUrl = busuanziConfig.jsUrl || ""; // 获取不蒜子JS地址
+const busuanziSiteUrl = busuanziConfig.siteUrl || ""; // 获取站点URL
 
 // 构建字体配置的 CSS 变量
 // ASCII 字体优先级最高（用于英文、数字等），CJK 字体作为回退
@@ -380,6 +386,13 @@ if (siteConfig.font) {
 
 		<!-- Umami Analytics -->
 		{umamiEnabled && umamiScripts && <Fragment set:html={umamiScripts} />}
+
+		<!-- Busuanzi Analytics -->
+		{
+			busuanziEnabled && busuanziJsUrl && busuanziSiteUrl && (
+				<script is:inline async src={`${busuanziJsUrl}?site=${busuanziSiteUrl}`}></script>
+			)
+		}
 	</head>
 	<body
 		class="min-h-screen"
@@ -402,6 +415,14 @@ if (siteConfig.font) {
 		<ConfigCarrier />
 		<slot />
 
+		<!-- 隐藏的不蒜子元素，用于接收数据 -->
+		{busuanziEnabled && (
+			<>
+				<span id="busuanzi_site_pv" style="display:none;"></span>
+				<span id="busuanzi_site_uv" style="display:none;"></span>
+			</>
+		)}
+
 		<!-- Music Player - 仅在启用时加载 -->
 		{musicPlayerConfig.enable && <MusicPlayer client:idle />}
 
@@ -410,6 +431,29 @@ if (siteConfig.font) {
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
+
+		<!-- 不蒜子数据同步脚本 -->
+		{busuanziEnabled && (
+			<script is:inline>
+				function syncBusuanziData() {
+					const pv = document.getElementById('busuanzi_site_pv');
+					const uv = document.getElementById('busuanzi_site_uv');
+					
+					if (pv?.textContent && uv?.textContent) {
+						document.querySelectorAll('.busuanzi-site-pv-value').forEach(el => el.textContent = pv.textContent);
+						document.querySelectorAll('.busuanzi-site-uv-value').forEach(el => el.textContent = uv.textContent);
+					} else {
+						setTimeout(syncBusuanziData, 100);
+					}
+				}
+				
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', () => setTimeout(syncBusuanziData, 500));
+				} else {
+					setTimeout(syncBusuanziData, 500);
+				}
+			</script>
+		)}
 	</body>
 </html>
 

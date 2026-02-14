@@ -1,6 +1,7 @@
 ---
 
-import { expressiveCodeConfig, siteConfig } from "../config";
+import { expressiveCodeConfig, siteConfig, umamiConfig } from "../config";
+const umamiEnabled = umamiConfig.enabled || false;
 ---
 
 <!-- 全局配置载体 -->
@@ -19,6 +20,8 @@ import { expressiveCodeConfig, siteConfig } from "../config";
   // 添加调试信息
   console.log('TOC Config:', window.siteConfig.toc);
 </script>
+{umamiEnabled && (
 
 <!-- 引入Umami Share工具脚本 -->
 <script is:inline src="/js/umami-share.js"></script>
+)}

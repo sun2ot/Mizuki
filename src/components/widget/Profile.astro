@@ -1,6 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-import { profileConfig, umamiConfig } from "../../config";
+import { busuanziConfig, profileConfig, umamiConfig } from "../../config";
 import { url } from "../../utils/url-utils";
 import ImageWrapper from "../misc/ImageWrapper.astro";
 import TypewriterText from "../TypewriterText.astro";
@@ -12,6 +12,9 @@ const umamiEnabled = umamiConfig.enabled || false;
 const umamiWebsiteId = umamiConfig.scripts.match(/data-website-id="([^"]+)"/)?.[1] || "";
 const umamiApiKey = umamiConfig.apiKey || "";
 const umamiBaseUrl = umamiConfig.baseUrl || "";
+
+// 解析不蒜子
+const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
 ---
 
 <div class="card-base p-3">
@@ -58,11 +61,17 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
             }
         </div>
         
-        {umamiEnabled && (
+        {(umamiEnabled || busuanziEnabled) && (
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
-            <div class="text-sm text-gray-500 mt-2 text-center">
+            <div class="text-sm text-neutral-700 dark:text-neutral-300 mt-2 text-center">
                 <Icon name="fa7-solid:eye" class="inline-block mr-1 text-gray-400 text-sm align-middle" />
-                <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
+                {umamiEnabled ? (
+                    <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
+                ) : (
+                    <span>
+                        {i18n(I18nKey.profileStatsPageViews)} <span class="busuanzi-site-pv-value">-</span> · {i18n(I18nKey.profileStatsVisits)} <span class="busuanzi-site-uv-value">-</span>
+                    </span>
+                )}
             </div>
         )}
     </div>

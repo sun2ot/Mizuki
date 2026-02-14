@@ -433,11 +433,13 @@ export const announcementConfig: AnnouncementConfig = {
 };
 
 export const musicPlayerConfig: MusicPlayerConfig = {
-	enable: true, // 启用音乐播放器功能
+	enable: false, // 启用音乐播放器功能
 	auto: true, // 自动播放（因线下浏览器策略，与页面交互一次后才可生效）
 	mode: "meting", // 音乐播放器模式，可选 "local" 或 "meting"
 	meting_api:
-		"https://www.bilibili.uno/api?server=:server&type=:type&id=:id&auth=:auth&r=:r", // Meting API 地址
+		// "https://www.bilibili.uno/api?server=:server&type=:type&id=:id&auth=:auth&r=:r", // Meting API 地址
+		// "https://meting.elysium-stack.cn/api?server=:server&type=:type&id=:id&auth=:auth&r=:r",
+		"https://music.zhheo.com/meting-api/?server=:server&type=:type&id=:id&auth=:auth&r=:r",
 	id: "17739438855", // 歌单ID
 	server: "netease", // 音乐源服务器。有的meting的api源支持更多平台,一般来说,netease=网易云音乐, tencent=QQ音乐, kugou=酷狗音乐, xiami=虾米音乐, baidu=百度音乐
 	type: "playlist", // 播单类型
@@ -621,10 +623,19 @@ export const widgetConfigs = {
 } as const;
 
 export const umamiConfig = {
-	enabled: true, // 是否显示Umami统计
+	enabled: false, // 是否显示Umami统计
 	apiKey: import.meta.env.UMAMI_API_KEY || "api_xxxxxxxx", // API密钥优先从环境变量读取，否则使用配置文件中的值
 	baseUrl: "https://api.umami.is", // Umami Cloud API地址
 	scripts: `
 <script defer src="https://cloud.umami.is/script.js" data-website-id="245b7851-ab56-4742-957b-d53a4bf358f9"></script>
   `.trim(), // 上面填你要插入的Script,不用再去Layout中插入
 } as const;
+
+// 不蒜子访问统计配置
+export const busuanziConfig: import("./types/config").BusuanziConfig = {
+	enable: true, // 是否启用不蒜子统计
+	jsUrl: "https://bsz.085404.xyz/js", // 自建不蒜子JS地址
+	siteUrl: "blog.085404.xyz", // 站点URL，用于统计识别
+	showInSiteStats: true, // 是否在站点统计组件中显示
+	showInProfile: true, // 是否在个人资料组件中显示
+};
