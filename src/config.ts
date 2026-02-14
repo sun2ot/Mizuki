@@ -433,7 +433,7 @@ export const announcementConfig: AnnouncementConfig = {
 };
 
 export const musicPlayerConfig: MusicPlayerConfig = {
-	enable: false, // 启用音乐播放器功能
+	enable: true, // 启用音乐播放器功能
 	auto: true, // 自动播放（因线下浏览器策略，与页面交互一次后才可生效）
 	mode: "meting", // 音乐播放器模式，可选 "local" 或 "meting"
 	meting_api:
