@@ -129,7 +129,7 @@ const {
     }
 
     async function fetchPageViews() {
-        const containers = document.querySelectorAll('.umami-page-views');
+        const container = document.querySelector('.umami-page-views');
         
         // 优先使用 oddmisc (umami)
         if (window.oddmisc) {
