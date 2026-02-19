@@ -129,8 +129,10 @@ const bannerOffset =
 
 // 不蒜子统计配置
 const busuanziEnabled = busuanziConfig.enable || false;
-const busuanziJsUrl = busuanziConfig.jsUrl || ""; // 获取不蒜子JS地址
-const busuanziSiteUrl = busuanziConfig.siteUrl || ""; // 获取站点URL
+const busuanziJsUrl = busuanziConfig.jsUrl || "";
+const busuanziSiteUrl = busuanziConfig.siteUrl || "";
+
+
 // 构建字体配置的 CSS 变量
 // ASCII 字体优先级最高（用于英文、数字等），CJK 字体作为回退
 let bodyFontFamily = "";
@@ -378,9 +380,10 @@ if (siteConfig.font) {
 			title={profileConfig.name}
 			href={`${Astro.site}rss.xml`}
 		/>
-
-		<!-- Busuanzi Analytics -->
-		{busuanziEnabled && <script is:inline async src={busuanziJsUrl}></script>}
+		
+		{busuanziEnabled && busuanziJsUrl && busuanziSiteUrl && (
+			<script is:inline async src={`${busuanziJsUrl}?site=${busuanziSiteUrl}`}></script>
+		)}
 	</head>
 	<body
 		class="min-h-screen"

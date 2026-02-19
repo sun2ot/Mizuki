@@ -6,7 +6,7 @@ import { i18n } from "../i18n/translation";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
 import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
 
-const busuanziEnabled = busuanziConfig.enable || false;
+const busuanziEnabled = busuanziConfig.enable;
 
 export interface Props {
 	published: Date;
@@ -133,28 +133,26 @@ const {
         
         // 优先使用 oddmisc (umami)
         if (window.oddmisc) {
-            containers.forEach(async (container) => {
-                const id = container?.dataset.id;
-                if (!id) return;
+            const id = container?.dataset.id;
+            if (!id) return;
 
-                try {
-                    const stats = await window.oddmisc.getStats(`/posts/${id}/`);
-                    const pageViews = stats.pageviews || 0;
-                    const visits = stats.visits || 0;
+            try {
+                const stats = await window.oddmisc.getStats(`/posts/${id}/`);
+                const pageViews = stats.pageviews || 0;
+                const visits = stats.visits || 0;
 
-                    if (pageViews === 0 && visits === 0) {
-                        container?.classList.add('hidden');
-                        return;
-                    }
-
-                    container?.classList.remove('hidden');
-                    const display = container.querySelector('.page-views-display');
-                    if (display) display.textContent = generateStatsText(pageViews, visits);
-                } catch (error) {
-                    console.error('Error fetching page views:', error);
+                if (pageViews === 0 && visits === 0) {
                     container?.classList.add('hidden');
+                    return;
                 }
-            });
+
+                container?.classList.remove('hidden');
+                const display = container.querySelector('.page-views-display');
+                if (display) display.textContent = generateStatsText(pageViews, visits);
+            } catch (error) {
+                console.error('Error fetching page views:', error);
+                container?.classList.add('hidden');
+            }
             return;
         }
 
@@ -166,13 +164,11 @@ const {
                 const pv = sourcePv.textContent.trim();
                 
                 if (pv) {
-                    containers.forEach(container => {
-                        container?.classList.remove('hidden');
-                        const display = container.querySelector('.page-views-display');
-                        if (display) {
-                            display.textContent = `${pageViewsText} ${pv}`;
-                        }
-                    });
+                    container?.classList.remove('hidden');
+                    const display = container.querySelector('.page-views-display');
+                    if (display) {
+                        display.textContent = `${pageViewsText} ${pv}`;
+                    }
                     return;
                 }
             }

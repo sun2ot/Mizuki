@@ -7,8 +7,7 @@ import TypewriterText from "../TypewriterText.astro";
 import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
 
-// 不蒜子统计配置
-const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
+const busuanziEnabled = busuanziConfig.enable;
 ---
 
 <div class="card-base p-3">
@@ -54,7 +53,6 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
                 </a>
             }
         </div>
-
         <div class="umami-stats-container hidden">
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
             <div class="text-sm text-neutral-700 dark:text-neutral-300 mt-2 text-center">
@@ -75,8 +73,7 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
         return `${profileStatsPageViews} ${pageViews} · ${profileStatsVisits} ${visits}`;
     }
 
-    async function fetchSiteStats() {
-        // 获取所有容器和显示元素
+    async function fetchSiteStats(isRetry = false) {
         const containers = document.querySelectorAll('.umami-stats-container');
         const displays = document.querySelectorAll('.site-stats-display');
 
@@ -87,15 +84,25 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
                 const pageViews = stats.pageviews || 0;
                 const visits = stats.visits || 0;
 
-                if (pageViews > 0 || visits > 0) {
-                    containers.forEach(container => container?.classList.remove('hidden'));
-                    displays.forEach(display => {
-                        if (display) display.textContent = generateStatsText(pageViews, visits);
-                    });
+                // 数据为 0 时隐藏
+                if (pageViews === 0 && visits === 0) {
+                    containers.forEach(container => container?.classList.add('hidden'));
                     return;
                 }
+
+                containers.forEach(container => container?.classList.remove('hidden'));
+                displays.forEach(display => {
+                    if (display) display.textContent = generateStatsText(pageViews, visits);
+                });
+                return;
             } catch (error) {
-                console.error('Error fetching umami stats:', error);
+                console.error('Error fetching site stats:', error);
+                if (!isRetry) {
+                    setTimeout(() => fetchSiteStats(true), 2000);
+                    return;
+                }
+                containers.forEach(container => container?.classList.add('hidden'));
+                return;
             }
         }
 

@@ -641,8 +641,6 @@ export const widgetConfigs = {
 // 不蒜子访问统计配置
 export const busuanziConfig: import("./types/config").BusuanziConfig = {
 	enable: true, // 是否启用不蒜子统计
-	jsUrl: "https://bsz.085404.xyz/js", // 自建不蒜子JS地址
-	siteUrl: "blog.085404.xyz", // 站点URL，用于统计识别
-	showInSiteStats: true, // 是否在站点统计组件中显示
-	showInProfile: true, // 是否在个人资料组件中显示
+	jsUrl: "https://bsz.085404.xyz/js", // 不蒜子JS地址
+	siteUrl: "blog.085404.xyz", // 站点URL，用于统计识别 (e.g. "blog.example.com")
 };
