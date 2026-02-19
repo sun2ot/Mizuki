@@ -651,3 +651,10 @@ export const widgetConfigs = {
 } as const;
 
 // umamiConfig相关配置已移动至astro.config.mjs中,统计脚本请自行在Layout.astro文件的<head>中插入
+
+// 不蒜子访问统计配置
+export const busuanziConfig: import("./types/config").BusuanziConfig = {
+	enable: false, // 是否启用不蒜子统计
+	jsUrl: "https://busuanzi-domain.com/js", // 不蒜子JS地址
+	siteUrl: "your-site-url", // 站点URL，用于统计识别 (e.g. "blog.example.com")
+};

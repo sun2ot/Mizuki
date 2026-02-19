@@ -3,6 +3,7 @@ import ConfigCarrier from "@components/ConfigCarrier.astro";
 import MusicPlayer from "@components/widget/MusicPlayer.svelte";
 import Pio from "@components/widget/Pio.svelte"; // 使用 Svelte 版本的 Pio 组件
 import {
+	busuanziConfig,
 	musicPlayerConfig,
 	pioConfig,
 	profileConfig,
@@ -125,6 +126,12 @@ const bannerOffsetByPosition = {
 };
 const bannerOffset =
 	bannerOffsetByPosition[siteConfig.banner.position || "center"];
+
+// 不蒜子统计配置
+const busuanziEnabled = busuanziConfig.enable || false;
+const busuanziJsUrl = busuanziConfig.jsUrl || "";
+const busuanziSiteUrl = busuanziConfig.siteUrl || "";
+
 
 // 构建字体配置的 CSS 变量
 // ASCII 字体优先级最高（用于英文、数字等），CJK 字体作为回退
@@ -374,6 +381,9 @@ if (siteConfig.font) {
 			href={`${Astro.site}rss.xml`}
 		/>
 		
+		{busuanziEnabled && busuanziJsUrl && busuanziSiteUrl && (
+			<script is:inline async src={`${busuanziJsUrl}?site=${busuanziSiteUrl}`}></script>
+		)}
 	</head>
 	<body
 		class="min-h-screen"
@@ -395,6 +405,15 @@ if (siteConfig.font) {
 
 		<ConfigCarrier />
 		<slot />
+
+		<!-- 隐藏的不蒜子元素，用于接收数据 -->
+		{busuanziEnabled && (
+			<>
+				<span id="busuanzi_site_pv" style="display:none;"></span>
+				<span id="busuanzi_site_uv" style="display:none;"></span>
+				<span id="busuanzi_page_pv" style="display:none;"></span>
+			</>
+		)}
 
 		<!-- Music Player - 仅在启用时加载 -->
 		{musicPlayerConfig.enable && <MusicPlayer client:idle />}

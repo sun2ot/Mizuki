@@ -1,9 +1,12 @@
 ---
 import { Icon } from "astro-icon/components";
+import { busuanziConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
 import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
+
+const busuanziEnabled = busuanziConfig.enable;
 
 export interface Props {
 	published: Date;
@@ -118,7 +121,8 @@ const {
 {!isHome && id && (
 <script is:inline define:vars={{
     pageViewsText: i18n(I18nKey.profileStatsPageViews),
-    visitsText: i18n(I18nKey.profileStatsVisits)
+    visitsText: i18n(I18nKey.profileStatsVisits),
+    busuanziEnabled
 }}>
     function generateStatsText(pageViews, visits) {
         return `${pageViewsText} ${pageViews} · ${visitsText} ${visits}`;
@@ -127,29 +131,50 @@ const {
     async function fetchPageViews() {
         const container = document.querySelector('.umami-page-views');
         
-        if (!window.oddmisc) {
-            container?.classList.add('hidden');
+        // 优先使用 oddmisc (umami)
+        if (window.oddmisc) {
+            const id = container?.dataset.id;
+            if (!id) return;
+
+            try {
+                const stats = await window.oddmisc.getStats(`/posts/${id}/`);
+                const pageViews = stats.pageviews || 0;
+                const visits = stats.visits || 0;
+
+                if (pageViews === 0 && visits === 0) {
+                    container?.classList.add('hidden');
+                    return;
+                }
+
+                container?.classList.remove('hidden');
+                const display = container.querySelector('.page-views-display');
+                if (display) display.textContent = generateStatsText(pageViews, visits);
+            } catch (error) {
+                console.error('Error fetching page views:', error);
+                container?.classList.add('hidden');
+            }
             return;
         }
 
-        const id = container?.dataset.id;
-        if (!id) return;
-
-        try {
-            const stats = await window.oddmisc.getStats(`/posts/${id}/`);
-            const pageViews = stats.pageviews || 0;
-            const visits = stats.visits || 0;
-
-            if (pageViews === 0 && visits === 0) {
-                container?.classList.add('hidden');
-                return;
+        // fallback 到 busuanzi
+        if (busuanziEnabled) {
+            const sourcePv = document.getElementById('busuanzi_page_pv');
+            
+            if (sourcePv?.textContent) {
+                const pv = sourcePv.textContent.trim();
+                
+                if (pv) {
+                    container?.classList.remove('hidden');
+                    const display = container.querySelector('.page-views-display');
+                    if (display) {
+                        display.textContent = `${pageViewsText} ${pv}`;
+                    }
+                    return;
+                }
             }
-
-            container?.classList.remove('hidden');
-            container.querySelector('.page-views-display').textContent = generateStatsText(pageViews, visits);
-        } catch (error) {
-            console.error('Error fetching page views:', error);
-            container?.classList.add('hidden');
+            
+            // 数据还未加载，延迟重试
+            setTimeout(fetchPageViews, 500);
         }
     }
 
