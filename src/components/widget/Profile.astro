@@ -55,16 +55,11 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
             }
         </div>
 
-        <div class="stats-container hidden">
+        <div class="umami-stats-container hidden">
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
             <div class="text-sm text-neutral-700 dark:text-neutral-300 mt-2 text-center">
                 <Icon name="fa7-solid:eye" class="inline-block mr-1 text-gray-400 text-sm align-middle" />
                 <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
-                {busuanziEnabled && (
-                    <span class="busuanzi-stats-display hidden">
-                        {i18n(I18nKey.profileStatsPageViews)} <span class="busuanzi-site-pv-value">-</span> · {i18n(I18nKey.profileStatsVisits)} <span class="busuanzi-site-uv-value">-</span>
-                    </span>
-                )}
             </div>
         </div>
     </div>
@@ -80,10 +75,10 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
         return `${profileStatsPageViews} ${pageViews} · ${profileStatsVisits} ${visits}`;
     }
 
-    async function fetchSiteStats(isRetry = false) {
-        const container = document.querySelector('.stats-container');
-        const umamiDisplay = document.querySelector('.site-stats-display');
-        const busuanziDisplay = document.querySelector('.busuanzi-stats-display');
+    async function fetchSiteStats() {
+        // 获取所有容器和显示元素
+        const containers = document.querySelectorAll('.umami-stats-container');
+        const displays = document.querySelectorAll('.site-stats-display');
 
         // 优先使用 oddmisc (umami)
         if (window.oddmisc) {
@@ -92,27 +87,45 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
                 const pageViews = stats.pageviews || 0;
                 const visits = stats.visits || 0;
 
-                // 数据为 0 时隐藏
-                if (pageViews === 0 && visits === 0) {
-                    container?.classList.add('hidden');
+                if (pageViews > 0 || visits > 0) {
+                    containers.forEach(container => container?.classList.remove('hidden'));
+                    displays.forEach(display => {
+                        if (display) display.textContent = generateStatsText(pageViews, visits);
+                    });
                     return;
                 }
-
-                container?.classList.remove('hidden');
-                umamiDisplay.textContent = generateStatsText(pageViews, visits);
-                return;
             } catch (error) {
                 console.error('Error fetching umami stats:', error);
             }
         }
 
         // fallback 到 busuanzi
-        if (busuanziEnabled && busuanziDisplay) {
-            container?.classList.remove('hidden');
-            umamiDisplay.classList.add('hidden');
-            busuanziDisplay.classList.remove('hidden');
-        } else {
-            container?.classList.add('hidden');
+        if (busuanziEnabled) {
+            const sourcePv = document.getElementById('busuanzi_site_pv');
+            const sourceUv = document.getElementById('busuanzi_site_uv');
+            
+            if (sourcePv?.textContent && sourceUv?.textContent) {
+                const pv = sourcePv.textContent.trim();
+                const uv = sourceUv.textContent.trim();
+                
+                if (pv && uv) {
+                    const text = generateStatsText(pv, uv);
+                    
+                    containers.forEach(container => {
+                        container?.classList.remove('hidden');
+                    });
+                    
+                    displays.forEach(display => {
+                        if (display) {
+                            display.textContent = text;
+                        }
+                    });
+                    return;
+                }
+            }
+            
+            // 数据还未加载，延迟重试
+            setTimeout(fetchSiteStats, 500);
         }
     }
 
