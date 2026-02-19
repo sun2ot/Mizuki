@@ -1,7 +1,6 @@
 ---
 
-import { expressiveCodeConfig, siteConfig, umamiConfig } from "../config";
-const umamiEnabled = umamiConfig.enabled || false;
+import { expressiveCodeConfig, siteConfig } from "../config";
 ---
 
 <!-- 全局配置载体 -->
@@ -16,12 +15,7 @@ const umamiEnabled = umamiConfig.enabled || false;
     depth: tocDepth,
     useJapaneseBadge: tocUseJapaneseBadge
   };
-  
+
   // 添加调试信息
   console.log('TOC Config:', window.siteConfig.toc);
 </script>
-{umamiEnabled && (
-
-<!-- 引入Umami Share工具脚本 -->
-<script is:inline src="/js/umami-share.js"></script>
-)}

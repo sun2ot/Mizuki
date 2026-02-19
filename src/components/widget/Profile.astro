@@ -1,19 +1,13 @@
 ---
 import { Icon } from "astro-icon/components";
-import { busuanziConfig, profileConfig, umamiConfig } from "../../config";
+import { busuanziConfig, profileConfig } from "../../config";
 import { url } from "../../utils/url-utils";
 import ImageWrapper from "../misc/ImageWrapper.astro";
 import TypewriterText from "../TypewriterText.astro";
 import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
 
-// 解析 umami
-const umamiEnabled = umamiConfig.enabled || false;
-const umamiWebsiteId = umamiConfig.scripts.match(/data-website-id="([^"]+)"/)?.[1] || "";
-const umamiApiKey = umamiConfig.apiKey || "";
-const umamiBaseUrl = umamiConfig.baseUrl || "";
-
-// 解析不蒜子
+// 不蒜子统计配置
 const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
 ---
 
@@ -32,10 +26,10 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
     <div class="px-2">
         <div class="font-bold text-xl text-center mb-1 dark:text-neutral-50 transition">{profileConfig.name}</div>
         <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2 transition"></div>
-        
+
         <div class="text-center text-neutral-400 mb-2.5 transition">
             {profileConfig.typewriter?.enable ? (
-                <TypewriterText 
+                <TypewriterText
                     text={profileConfig.bio || ""}
                     speed={profileConfig.typewriter.speed}
                     class="inline-block"
@@ -44,15 +38,15 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
                 profileConfig.bio
             )}
         </div>
-        
+
         <div class="flex flex-wrap gap-2 justify-center mb-1">
             {profileConfig.links.length > 1 && profileConfig.links.map(item =>
-                <a rel="me" aria-label={item.name} href={item.url} target="_blank" 
+                <a rel="me" aria-label={item.name} href={item.url} target="_blank"
                    class="btn-regular rounded-lg h-10 w-10 active:scale-90">
                     <Icon name={item.icon} class="text-[1.5rem]"></Icon>
                 </a>
             )}
-            {profileConfig.links.length == 1 && 
+            {profileConfig.links.length == 1 &&
                 <a rel="me" aria-label={profileConfig.links[0].name} href={profileConfig.links[0].url} target="_blank"
                    class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95">
                     <Icon name={profileConfig.links[0].icon} class="text-[1.5rem]"></Icon>
@@ -60,70 +54,71 @@ const busuanziEnabled = busuanziConfig.enable && busuanziConfig.showInProfile;
                 </a>
             }
         </div>
-        
-        {(umamiEnabled || busuanziEnabled) && (
+
+        <div class="stats-container hidden">
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
             <div class="text-sm text-neutral-700 dark:text-neutral-300 mt-2 text-center">
                 <Icon name="fa7-solid:eye" class="inline-block mr-1 text-gray-400 text-sm align-middle" />
-                {umamiEnabled ? (
-                    <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
-                ) : (
-                    <span>
+                <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
+                {busuanziEnabled && (
+                    <span class="busuanzi-stats-display hidden">
                         {i18n(I18nKey.profileStatsPageViews)} <span class="busuanzi-site-pv-value">-</span> · {i18n(I18nKey.profileStatsVisits)} <span class="busuanzi-site-uv-value">-</span>
                     </span>
                 )}
             </div>
-        )}
+        </div>
     </div>
 </div>
 
-{umamiEnabled && (
-    <script is:inline type="module" define:vars={{ 
-        umamiBaseUrl, 
-        umamiApiKey, 
-        umamiWebsiteId, 
-        umamiConfig,
-        profileStatsPageViews: i18n(I18nKey.profileStatsPageViews),
-        profileStatsVisits: i18n(I18nKey.profileStatsVisits),
-        profileStatsUnavailable: i18n(I18nKey.profileStatsUnavailable)
-    }}>
-        // 客户端统计文案生成函数
-        function generateStatsText(pageViews, visits) {
-            return `${profileStatsPageViews} ${pageViews} · ${profileStatsVisits} ${visits}`;
-        }
-        
-        // 获取访问量统计
-        async function fetchSiteStats() {
-            if (!umamiConfig.enabled) {
-                return;
-            }
-            
+<script is:inline define:vars={{
+    profileStatsPageViews: i18n(I18nKey.profileStatsPageViews),
+    profileStatsVisits: i18n(I18nKey.profileStatsVisits),
+    profileStatsUnavailable: i18n(I18nKey.profileStatsUnavailable),
+    busuanziEnabled
+}}>
+    function generateStatsText(pageViews, visits) {
+        return `${profileStatsPageViews} ${pageViews} · ${profileStatsVisits} ${visits}`;
+    }
+
+    async function fetchSiteStats(isRetry = false) {
+        const container = document.querySelector('.stats-container');
+        const umamiDisplay = document.querySelector('.site-stats-display');
+        const busuanziDisplay = document.querySelector('.busuanzi-stats-display');
+
+        // 优先使用 oddmisc (umami)
+        if (window.oddmisc) {
             try {
-                // 调用全局工具获取 Umami 统计数据
-                const stats = await getUmamiWebsiteStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId);
-                
-                // 从返回的数据中提取页面浏览量和访客数
+                const stats = await window.oddmisc.getSiteStats();
                 const pageViews = stats.pageviews || 0;
                 const visits = stats.visits || 0;
-                
-                const displayElements = document.querySelectorAll('.site-stats-display');
-                displayElements.forEach(element => {
-                    element.textContent = generateStatsText(pageViews, visits);
-                });
+
+                // 数据为 0 时隐藏
+                if (pageViews === 0 && visits === 0) {
+                    container?.classList.add('hidden');
+                    return;
+                }
+
+                container?.classList.remove('hidden');
+                umamiDisplay.textContent = generateStatsText(pageViews, visits);
+                return;
             } catch (error) {
-                console.error('Error fetching site stats:', error);
-                const displayElements = document.querySelectorAll('.site-stats-display');
-                displayElements.forEach(element => {
-                    element.textContent = profileStatsUnavailable;
-                });
+                console.error('Error fetching umami stats:', error);
             }
         }
 
-        if (document.readyState === 'loading') {
-            // 页面加载完成后获取统计数据
-            document.addEventListener('DOMContentLoaded', () => fetchSiteStats());
+        // fallback 到 busuanzi
+        if (busuanziEnabled && busuanziDisplay) {
+            container?.classList.remove('hidden');
+            umamiDisplay.classList.add('hidden');
+            busuanziDisplay.classList.remove('hidden');
         } else {
-            fetchSiteStats();
+            container?.classList.add('hidden');
         }
-    </script>
-)}
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => fetchSiteStats());
+    } else {
+        fetchSiteStats();
+    }
+</script>
