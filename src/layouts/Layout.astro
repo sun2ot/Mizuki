@@ -382,7 +382,7 @@ if (siteConfig.font) {
 		/>
 		
 		{busuanziEnabled && busuanziJsUrl && busuanziSiteUrl && (
-			<script is:inline async src={`${busuanziJsUrl}?site=${busuanziSiteUrl}`}></script>
+			<script is:inline async src={`${busuanziJsUrl}?site=${busuanziSiteUrl}`} {...{ pjax: true }}></script>
 		)}
 	</head>
 	<body
