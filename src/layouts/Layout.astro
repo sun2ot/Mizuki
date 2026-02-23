@@ -384,6 +384,9 @@ if (siteConfig.font) {
 		{busuanziEnabled && busuanziJsUrl && busuanziSiteUrl && (
 			<script is:inline async src={`${busuanziJsUrl}?site=${busuanziSiteUrl}`} {...{ pjax: true }}></script>
 		)}
+
+		<!-- Umami 统计脚本 -->
+  		<script is:inline defer src="https://umami.085404.xyz/script.js" data-website-id="d16c72cf-4a54-4c51-8788-8d1531f1c101"></script>
 	</head>
 	<body
 		class="min-h-screen"
