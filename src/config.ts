@@ -283,6 +283,12 @@ export const navBarConfig: NavBarConfig = {
 					external: true,
 					icon: "academicons:orcid",
 				},
+				{
+					name: "Komari",
+					url: "https://komari.085404.xyz",
+					external: true,
+					icon: "fa7-solid:tower-cell",
+				},
 			],
 		},
 		{
@@ -436,12 +442,12 @@ export const shareConfig: ShareConfig = {
 
 export const announcementConfig: AnnouncementConfig = {
 	title: "公告栏", // 公告标题
-	content: "就这样吧，希望能帮到你。", // 公告内容
+	content: "邮件联系 sun2ot@qq.com", // 公告内容
 	closable: true, // 允许用户关闭公告
 	link: {
 		enable: true, // 启用链接
-		text: "邮件联系", // 链接文本
-		url: "mailto:sun2ot@qq.com", // 链接 URL
+		text: "友链申请", // 链接文本
+		url: "https://docs.qq.com/form/page/DU0JSRkRkTnV2QUZx?tdocapp_full_screen=1&templateId=25000&create_type=2&no_promotion=1&is_blank_or_template=blank", // 链接 URL
 		external: false, // 内部链接
 	},
 };
