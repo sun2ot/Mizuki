@@ -694,18 +694,6 @@ export const randomPostsConfig: RandomPostsConfig = {
 	maxCount: 5,
 };
 
-// 相关文章配置
-export const relatedPostsConfig: RelatedPostsConfig = {
-	enable: true,
-	maxCount: 5,
-};
-
-// 随机文章配置
-export const randomPostsConfig: RandomPostsConfig = {
-	enable: true,
-	maxCount: 5,
-};
-
 // 导出所有配置的统一接口
 export const widgetConfigs = {
 	profile: profileConfig,
@@ -721,10 +709,3 @@ export const widgetConfigs = {
 } as const;
 
 // umamiConfig相关配置已移动至astro.config.mjs中,统计脚本请自行在Layout.astro文件的<head>中插入
-
-// 不蒜子访问统计配置
-export const busuanziConfig: import("./types/config").BusuanziConfig = {
-	enable: false, // 是否启用不蒜子统计
-	jsUrl: "https://bsz.085404.xyz/js", // 不蒜子JS地址
-	siteUrl: "blog.085404.xyz", // 站点URL，用于统计识别 (e.g. "blog.example.com")
-};

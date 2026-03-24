@@ -281,7 +281,7 @@ onDestroy(() => {
 </div>
 
 <style>
-    @reference "../styles/main.css";
+    @import "../../../styles/main.css";
 
     input:focus {
         outline: 0;
