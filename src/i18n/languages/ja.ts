@@ -272,6 +272,7 @@ export const ja: Translation = {
 		"このコンテンツはパスワードで保護されています",
 	[Key.passwordProtectedDescription]:
 		"保護されたコンテンツを表示するにはパスワードを入力してください。",
+	[Key.postEncrypted]: "暗号化",
 	[Key.passwordPlaceholder]: "パスワードを入力",
 	[Key.passwordUnlock]: "ロックを解除",
 	[Key.passwordUnlocking]: "ロックを解除中...",
@@ -288,6 +289,7 @@ export const ja: Translation = {
 	[Key.syntaxHighlightFailed]: "構文の強調表示が失敗しました:",
 	[Key.autoSyntaxHighlightFailed]: "自動構文強調表示が失敗しました:",
 	[Key.decryptionError]: "復号中にエラーが発生しました:",
+	[Key.passwordHint]: "ヒント",
 
 	// 最終更新時間カード
 	[Key.lastModifiedPrefix]: "最終編集からの時間: ",
@@ -355,4 +357,10 @@ export const ja: Translation = {
 	// レイアウト切り替えボタン
 	[Key.switchToGridMode]: "グリッド表示に切り替え",
 	[Key.switchToListMode]: "リスト表示に切り替え",
+
+	// 関連記事とランダム記事
+	[Key.relatedPosts]: "関連記事",
+	[Key.randomPosts]: "ランダム記事",
+	[Key.smartRecommend]: "スマート",
+	[Key.randomRecommend]: "ランダム",
 };

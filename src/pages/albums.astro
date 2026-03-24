@@ -38,11 +38,11 @@ const albumsData = await scanAlbums();
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {albumsData.map(album => (
           <article 
-            class="album-card group bg-(--card-bg) rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-(--line-divider)"
+            class="album-card group bg-[var(--card-bg)] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-[var(--line-divider)]"
           >
             <a href={`/albums/${album.id}/`} class="block">
               <!-- 封面图片 -->
-              <div class="aspect-4/3 overflow-hidden bg-black/5 dark:bg-white/5">
+              <div class="aspect-[4/3] overflow-hidden bg-[var(--btn-regular-bg)]">
                 <img 
                   src={album.cover} 
                   alt={album.title}

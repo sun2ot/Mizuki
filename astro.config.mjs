@@ -1,9 +1,9 @@
 import sitemap from "@astrojs/sitemap";
 import svelte, { vitePreprocess } from "@astrojs/svelte";
-import tailwindcss from "@tailwindcss/vite";
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import swup from "@swup/astro";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
@@ -13,7 +13,6 @@ import rehypeComponents from "rehype-components";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive";
-import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
 import { siteConfig } from "./src/config.ts";
@@ -28,6 +27,8 @@ import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkContent } from "./src/plugins/remark-content.mjs";
 import { rehypeImageWidth } from "./src/plugins/rehype-image-width.mjs";
+import rehypeExternalLinks from "rehype-external-links";
+import { remarkFixGithubAdmonitions } from "./src/plugins/remark-fix-github-admonitions.js";
 
 // https://astro.build/config
 export default defineConfig({
@@ -49,7 +50,7 @@ export default defineConfig({
 			cache: true,
 			preload: true, // swup 默认鼠标悬停预加载
 			accessibility: true,
-			updateHead: true,
+			updateHead: process.env.NODE_ENV === "production",
 			updateBodyClass: false,
 			globalInstance: true,
 			// 滚动相关配置优化
@@ -121,8 +122,7 @@ export default defineConfig({
 		remarkPlugins: [
 			remarkMath,
 			remarkContent,
-			remarkGithubAdmonitionsCaseInsensitive,
-			remarkGithubAdmonitionsToDirectives,
+			remarkFixGithubAdmonitions,
 			remarkDirective,
 			remarkSectionize,
 			parseDirectiveNode,
@@ -130,10 +130,16 @@ export default defineConfig({
 		],
 		rehypePlugins: [
 			rehypeKatex,
+			[
+				rehypeExternalLinks,
+				{
+					target: "_blank",
+					rel: ["nofollow", "noopener", "noreferrer"],
+				},
+			],
 			rehypeSlug,
 			rehypeWrapTable,
 			rehypeMermaid,
-			rehypeImageWidth,
 			[
 				rehypeComponents,
 				{
@@ -166,14 +172,19 @@ export default defineConfig({
 					},
 				},
 			],
+			rehypeImageWidth,
 		],
 	},
 	vite: {
 		plugins: [tailwindcss()],
 		build: {
-			// 静态资源处理优化，防止小图片转 base64 导致 HTML 体积过大（可选，根据需要调整）
+			// 静态资源处理优化，防止小图片转 base64 导致 HTML 体积过大
 			assetsInlineLimit: 4096,
-
+			// CSS 代码分割
+			cssCodeSplit: true,
+			cssMinify: "esbuild",
+			// 生产环境移除 console 和 debugger
+			minify: "esbuild",
 			rollupOptions: {
 				onwarn(warning, warn) {
 					if (
@@ -189,6 +200,13 @@ export default defineConfig({
 					warn(warning);
 				},
 			},
+		},
+		// 生产环境移除 console.log 和 debugger
+		esbuildOptions: {
+			drop:
+				process.env.NODE_ENV === "production"
+					? ["console", "debugger"]
+					: [],
 		},
 	},
 });
