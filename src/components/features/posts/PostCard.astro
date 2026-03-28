@@ -2,7 +2,7 @@
 import { render } from "astro:content";
 import { Icon } from "astro-icon/components";
 
-import { getFileDirFromPath, getPostUrl,getTagUrl } from "@/utils/url-utils";
+import { getFileDirFromPath, getPostUrl, getTagUrl } from "@/utils/url-utils";
 
 import { siteConfig } from "../../../config";
 import I18nKey from "../../../i18n/i18nKey";
@@ -45,8 +45,14 @@ const { remarkPluginFrontmatter } = await render(entry);
 		class:list={[
 			"pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative",
 			{
+<<<<<<< HEAD
 				"w-full md:w-[calc(100%-3.25rem-0.75rem)]": !hasCover,
 				"w-full md:w-[calc(100%-var(--coverWidth)-0.75rem)]": hasCover,
+=======
+				"w-full md:w-[calc(100%_-_3.25rem_-_0.75rem)]": !hasCover,
+				"w-full md:w-[calc(100%_-_var(--coverWidth)_-_0.75rem)]":
+					hasCover,
+>>>>>>> upstream/master
 			},
 		]}
 	>
@@ -157,6 +163,8 @@ const { remarkPluginFrontmatter } = await render(entry);
 					basePath={getFileDirFromPath(entry.filePath || "")}
 					alt="Cover Image of the Post"
 					class="w-full h-full"
+					widths={[200, 400, 800]}
+					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 				/>
 			</a>
 		)

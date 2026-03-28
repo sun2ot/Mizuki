@@ -9,14 +9,25 @@
 		isCurrent: boolean;
 		isPlaying: boolean;
 		onclick: () => void;
+		lazy?: boolean;
 	}
 
-	const { song, index, isCurrent, isPlaying, onclick }: Props = $props();
+	const {
+		song,
+		index,
+		isCurrent,
+		isPlaying,
+		onclick,
+		lazy = true,
+	}: Props = $props();
 
 	function getAssetPath(path: string): string {
-		if (path.startsWith("http://") || path.startsWith("https://"))
-			{return path;}
-		if (path.startsWith("/")) {return path;}
+		if (path.startsWith("http://") || path.startsWith("https://")) {
+			return path;
+		}
+		if (path.startsWith("/")) {
+			return path;
+		}
 		return `/${path}`;
 	}
 </script>
@@ -54,7 +65,8 @@
 		<img
 			src={getAssetPath(song.cover)}
 			alt={song.title}
-			loading="lazy"
+			loading={lazy ? "lazy" : "eager"}
+			decoding="async"
 			class="w-full h-full object-cover"
 		/>
 	</div>

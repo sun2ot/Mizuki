@@ -16,6 +16,182 @@
 	let retryCount = 0;
 	const MAX_RETRIES = 3;
 	const RETRY_DELAY = 1000; // 1秒
+	let fullscreenOverlay = null;
+
+	function injectFullscreenStyles() {
+		if (document.getElementById("mermaid-fullscreen-style")) {
+			return;
+		}
+
+		const style = document.createElement("style");
+		style.id = "mermaid-fullscreen-style";
+		style.textContent = `
+		:where(.mermaid[data-mermaid-code]) { position: relative; }
+		.mermaid-fullscreen-btn {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			height: 36px;
+			width: 36px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			transition: opacity 0.2s ease;
+			z-index: 3;
+		}
+		.mermaid:hover .mermaid-fullscreen-btn,
+		.mermaid:focus-within .mermaid-fullscreen-btn {
+			opacity: 1;
+		}
+		.mermaid-fullscreen-overlay {
+			position: fixed;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: clamp(12px, 3vw, 28px);
+			backdrop-filter: blur(6px);
+			z-index: 9999;
+			background: var(--mermaid-fs-backdrop, rgba(15, 23, 42, 0.9));
+		}
+		.mermaid-fullscreen-stage {
+			position: relative;
+			width: min(1200px, 96vw);
+			max-height: 90vh;
+			padding: clamp(12px, 2vw, 18px);
+			background: var(--mermaid-fs-surface, #0f172a);
+			border: 1px solid var(--mermaid-fs-border, rgba(255,255,255,0.08));
+			border-radius: 16px;
+			box-shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+			overflow: hidden;
+		}
+		.mermaid-fullscreen-stage svg {
+			width: 100%;
+			height: auto;
+			min-height: 320px;
+		}
+		.mermaid-fullscreen-close {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			z-index: 4;
+		}
+		.mermaid-fullscreen-overlay .mermaid-zoom-controls {
+			position: absolute;
+			left: 12px;
+			bottom: 12px;
+			display: flex;
+			gap: 8px;
+		}
+		body.mermaid-fullscreen-open { overflow: hidden; }
+		`;
+		document.head.appendChild(style);
+	}
+
+	function getThemePalette() {
+		const htmlElement = document.documentElement;
+		const isDark = htmlElement.classList.contains("dark");
+		const styles = getComputedStyle(htmlElement);
+		const primary =
+			styles.getPropertyValue("--primary")?.trim() ||
+			(isDark ? "#7dd3fc" : "#2563eb");
+		const surface =
+			styles.getPropertyValue("--card-bg")?.trim() ||
+			styles.getPropertyValue("--surface")?.trim() ||
+			(isDark ? "#0b1220" : "#ffffff");
+		const text =
+			styles.getPropertyValue("--text-color")?.trim() ||
+			styles.getPropertyValue("--foreground")?.trim() ||
+			(isDark ? "#e5e7eb" : "#0f172a");
+		const muted =
+			styles.getPropertyValue("--muted")?.trim() ||
+			styles.getPropertyValue("--muted-foreground")?.trim() ||
+			(isDark ? "#1f2937" : "#e5e7eb");
+		const backdrop = isDark
+			? "rgba(8, 15, 30, 0.9)"
+			: "rgba(255, 255, 255, 0.94)";
+
+		return { isDark, primary, surface, text, muted, backdrop };
+	}
+
+	function closeFullscreen() {
+		if (fullscreenOverlay) {
+			fullscreenOverlay.remove();
+			fullscreenOverlay = null;
+			document.body.classList.remove("mermaid-fullscreen-open");
+		}
+	}
+
+	function openFullscreen(svgElement) {
+		const palette = getThemePalette();
+		injectFullscreenStyles();
+
+		closeFullscreen();
+
+		const overlay = document.createElement("div");
+		overlay.className = "mermaid-fullscreen-overlay";
+		overlay.style.setProperty("--mermaid-fs-backdrop", palette.backdrop);
+		overlay.style.setProperty("--mermaid-fs-surface", palette.surface);
+		overlay.style.setProperty(
+			"--mermaid-fs-border",
+			palette.isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)",
+		);
+
+		const closeButton = document.createElement("button");
+		closeButton.className =
+			"mermaid-fullscreen-close btn-regular rounded-lg h-10 w-10";
+		closeButton.title = "关闭全屏";
+		closeButton.textContent = "✕";
+		closeButton.addEventListener("click", closeFullscreen);
+
+		const stage = document.createElement("div");
+		stage.className = "mermaid-fullscreen-stage";
+
+		const clonedSvg = svgElement.cloneNode(true);
+		stage.appendChild(clonedSvg);
+		overlay.appendChild(stage);
+		overlay.appendChild(closeButton);
+
+		overlay.addEventListener("click", (ev) => {
+			if (ev.target === overlay) {
+				closeFullscreen();
+			}
+		});
+
+		const escHandler = (ev) => {
+			if (ev.key === "Escape") {
+				closeFullscreen();
+			}
+		};
+		window.addEventListener("keydown", escHandler, { once: true });
+
+		document.body.appendChild(overlay);
+		document.body.classList.add("mermaid-fullscreen-open");
+		fullscreenOverlay = overlay;
+
+		// 为全屏内的图表添加缩放控制
+		attachZoomControls(stage, clonedSvg);
+	}
+
+	function ensureFullscreenButton(element) {
+		if (element.querySelector(".mermaid-fullscreen-btn")) {
+			return;
+		}
+		const btn = document.createElement("button");
+		btn.type = "button";
+		btn.className = "mermaid-fullscreen-btn btn-regular rounded-lg h-9 w-9";
+		btn.title = "全屏查看";
+		btn.setAttribute("aria-label", "全屏查看 Mermaid 图表");
+		btn.innerHTML = "⛶";
+		btn.addEventListener("click", (ev) => {
+			ev.stopPropagation();
+			const svg = element.querySelector("svg");
+			if (!svg) {return;}
+			openFullscreen(svg);
+		});
+		element.appendChild(btn);
+	}
 
 	// 检查主题是否真的发生了变化
 	function hasThemeChanged() {
@@ -267,6 +443,9 @@
 		// 页面切换前清理
 		document.addEventListener("astro:before-swap", cleanupMutationObserver);
 
+		// 页面切换前清理全屏状态
+		document.addEventListener("astro:before-swap", closeFullscreen);
+
 		// Swup 页面切换时重新设置 Observer
 		document.addEventListener("astro:after-swap", () => {
 			if (themeObserver === null) {
@@ -427,6 +606,7 @@
 										svgElement.style.filter = "none";
 									}
 									attachZoomControls(element, insertedSvg);
+									ensureFullscreenButton(element);
 								}
 
 								// 渲染成功，跳出重试循环

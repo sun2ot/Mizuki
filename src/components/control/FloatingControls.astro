@@ -1,12 +1,11 @@
 ---
 import type { MarkdownHeading } from "astro";
 
+import { musicPlayerConfig, siteConfig } from "../../config";
+import FloatingTOC from "../features/toc/FloatingTOC.astro";
 import BackToHome from "./BackToHome.astro";
 import BackToTop from "./BackToTop.astro";
 import MusicFabButton from "./MusicFabButton.svelte";
-import FloatingTOC from "../features/toc/FloatingTOC.astro";
-
-import { musicPlayerConfig, siteConfig } from "../../config";
 
 interface Props {
 	headings?: MarkdownHeading[];
@@ -44,6 +43,7 @@ const { headings = [] } = Astro.props;
 	:global(:root) {
 		--fab-group-right: 1.5rem;
 		--fab-group-bottom: 10rem;
+		--fab-group-base-bottom: 10rem;
 		--fab-group-gap: 0.5rem;
 		--fab-button-size: 3rem;
 		--fab-visible-count: 1;
@@ -59,6 +59,7 @@ const { headings = [] } = Astro.props;
 
 		right: var(--fab-group-right);
 		bottom: var(--fab-group-bottom);
+		transition: bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.floating-control-item {
@@ -158,6 +159,7 @@ const { headings = [] } = Astro.props;
 		:global(:root) {
 			--fab-group-right: 1rem;
 			--fab-group-bottom: 6rem;
+			--fab-group-base-bottom: 6rem;
 		}
 
 		.floating-controls-container {
@@ -170,6 +172,7 @@ const { headings = [] } = Astro.props;
 		:global(:root) {
 			--fab-group-right: 0.75rem;
 			--fab-group-bottom: 5rem;
+			--fab-group-base-bottom: 5rem;
 			--fab-button-size: 2.75rem;
 		}
 
@@ -183,6 +186,7 @@ const { headings = [] } = Astro.props;
 		:global(:root) {
 			--fab-group-right: 0.5rem;
 			--fab-group-bottom: 4.5rem;
+			--fab-group-base-bottom: 4.5rem;
 			--fab-button-size: 2.5rem;
 		}
 
@@ -196,6 +200,7 @@ const { headings = [] } = Astro.props;
 		:global(:root) {
 			--fab-group-right: 0.25rem;
 			--fab-group-bottom: 4rem;
+			--fab-group-base-bottom: 4rem;
 		}
 
 		.floating-controls-container {
@@ -207,6 +212,7 @@ const { headings = [] } = Astro.props;
 	@media (orientation: landscape) and (max-height: 500px) {
 		:global(:root) {
 			--fab-group-bottom: 4rem;
+			--fab-group-base-bottom: 4rem;
 		}
 
 		.floating-controls-container {
@@ -241,6 +247,7 @@ const { headings = [] } = Astro.props;
 		const items = document.querySelectorAll(
 			".floating-control-item[data-control-key]",
 		);
+		const totalItems = items.length;
 		let hasVisibleItem = false;
 		let visibleCount = 0;
 
@@ -269,11 +276,34 @@ const { headings = [] } = Astro.props;
 			"--fab-visible-count",
 			String(Math.max(visibleCount, 1)),
 		);
+
+		if (visibleCount >= totalItems) {
+			document.documentElement.style.removeProperty(
+				"--fab-group-bottom",
+			);
+		} else {
+			const baseBottom = parseFloat(
+				getComputedStyle(document.documentElement).getPropertyValue(
+					"--fab-group-base-bottom",
+				),
+			);
+			if (!isNaN(baseBottom) && totalItems > 0) {
+				const minBottom = 1.5;
+				const ratio = visibleCount / totalItems;
+				const newBottom = minBottom + (baseBottom - minBottom) * ratio;
+				document.documentElement.style.setProperty(
+					"--fab-group-bottom",
+					newBottom + "rem",
+				);
+			}
+		}
 	}
 
 	function observeFloatingControlButton(id) {
 		const target = document.getElementById(id);
-		if (!target) return;
+		if (!target) {
+			return;
+		}
 
 		const existing = window.__floatingControlObservers.get(id);
 		if (existing) {
@@ -316,7 +346,9 @@ const { headings = [] } = Astro.props;
 							? "back-to-top-btn"
 							: null;
 
-			if (!id) continue;
+			if (!id) {
+				continue;
+			}
 
 			const button = document.getElementById(id);
 			const isVisible = Boolean(
@@ -327,7 +359,9 @@ const { headings = [] } = Astro.props;
 
 		for (const id of controlButtonIds) {
 			const button = document.getElementById(id);
-			if (!button) continue;
+			if (!button) {
+				continue;
+			}
 
 			const isVisible = !button.classList.contains("hide");
 			button.classList.toggle("fab-lock-visible", isVisible);
@@ -391,7 +425,9 @@ const { headings = [] } = Astro.props;
 	initFloatingControlVisibility();
 
 	function scheduleVisibilityUpdate() {
-		if (visibilityUpdateScheduled || mermaidRendering) return;
+		if (visibilityUpdateScheduled || mermaidRendering) {
+			return;
+		}
 		visibilityUpdateScheduled = true;
 		requestAnimationFrame(() => {
 			visibilityUpdateScheduled = false;

@@ -1,4 +1,4 @@
-import { siteConfig } from '../config';
+import { siteConfig } from "../config";
 
 /**
  * Format relative time for diary moments
@@ -13,15 +13,17 @@ export function formatRelativeTime(
 	hoursAgo: string,
 	daysAgo: string,
 ): string {
-	let timeGap = 8; // Default East 8th district
+	let timeGap = 8; // Default UTC+8
 	if (siteConfig.timeZone >= -12 && siteConfig.timeZone <= 12) {
 		timeGap = siteConfig.timeZone;
 	}
 
 	const now = new Date();
+	const utc = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
+	const localNow = utc + timeGap * 60 * 60 * 1000;
 	const date = new Date(dateString);
 	const diffInMinutes = Math.floor(
-		(now.getTime() + timeGap * 60 * 60 * 1000 - date.getTime()) / (1000 * 60),
+		(localNow - date.getTime()) / (1000 * 60),
 	);
 
 	if (diffInMinutes < 60) {

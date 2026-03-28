@@ -357,6 +357,9 @@ class MusicPlayerStore {
 		}
 		this.state.willAutoPlay = autoPlay;
 		if (this.audio) {
+			if (this.audio.src && song.url) {
+				this.audio.src = "";
+			}
 			this.audio.src = getAssetPath(song.url);
 			this.audio.load();
 		}

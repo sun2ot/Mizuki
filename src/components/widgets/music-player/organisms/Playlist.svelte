@@ -41,7 +41,10 @@
 				<Icon icon="material-symbols:close" class="text-lg" />
 			</button>
 		</div>
-		<div class="playlist-content overflow-y-auto max-h-80 hide-scrollbar">
+		<div
+			class="playlist-content overflow-y-auto max-h-80 hide-scrollbar"
+			role="presentation"
+		>
 			{#each playlist as song, index}
 				<PlaylistItem
 					{song}
@@ -49,6 +52,7 @@
 					isCurrent={index === currentIndex}
 					{isPlaying}
 					onclick={() => onPlaySong(index)}
+					lazy={index !== 0}
 				/>
 			{/each}
 		</div>

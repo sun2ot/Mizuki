@@ -193,6 +193,7 @@ export interface SiteConfig {
 	favicon: Favicon[];
 	showLastModified: boolean; // 控制"上次编辑"卡片显示的开关
 	pageProgressBar?: PageProgressBarConfig; // 页面顶部进度条配置
+	thirdPartyAnalytics?: ThirdPartyAnalyticsConfig; // 第三方统计配置
 }
 
 export interface Favicon {
@@ -512,4 +513,12 @@ export interface PageProgressBarConfig {
 	enable: boolean; // 是否启用页面顶部进度条
 	height?: number; // 进度条高度，默认 3px
 	duration?: number; // 动画时长，默认 8000ms
+}
+
+/**
+ * 第三方统计配置（可能影响 Lighthouse 评分）
+ */
+export interface ThirdPartyAnalyticsConfig {
+	enable: boolean; // 是否启用第三方统计（Microsoft Clarity），默认关闭
+	clarityId?: string; // Clarity 项目 ID
 }

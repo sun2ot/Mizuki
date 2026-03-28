@@ -10,25 +10,26 @@ import icon from "astro-icon";
 import { umami } from "oddmisc";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeComponents from "rehype-components";
+import rehypeExternalLinks from "rehype-external-links";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
+
 import { siteConfig } from "./src/config.ts";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badge.ts";
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
+import { rehypeImageWidth } from "./src/plugins/rehype-image-width.mjs";
 import { rehypeMermaid } from "./src/plugins/rehype-mermaid.mjs";
 import { remarkGithubAdmonitionsCaseInsensitive } from "./src/plugins/remark-github-admonitions-case-insensitive.mjs";
 import { rehypeWrapTable } from "./src/plugins/rehype-wrap-table.mjs";
-import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
-import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkContent } from "./src/plugins/remark-content.mjs";
-import { rehypeImageWidth } from "./src/plugins/rehype-image-width.mjs";
-import rehypeExternalLinks from "rehype-external-links";
+import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkFixGithubAdmonitions } from "./src/plugins/remark-fix-github-admonitions.js";
+import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 
 // https://astro.build/config
 export default defineConfig({
@@ -48,7 +49,7 @@ export default defineConfig({
 			containers: ["main"],
 			smoothScrolling: false, // 禁用平滑滚动以提升性能，避免与锚点导航冲突
 			cache: true,
-			preload: true, // swup 默认鼠标悬停预加载
+			preload: false, // 禁用预加载以提升性能
 			accessibility: true,
 			updateHead: process.env.NODE_ENV === "production",
 			updateBodyClass: false,
@@ -183,6 +184,8 @@ export default defineConfig({
 			// CSS 代码分割
 			cssCodeSplit: true,
 			cssMinify: "esbuild",
+			// 内联小型 CSS 文件以减少网络请求
+			inlineStylesheets: "auto",
 			// 生产环境移除 console 和 debugger
 			minify: "esbuild",
 			rollupOptions: {

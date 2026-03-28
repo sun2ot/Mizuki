@@ -24,7 +24,12 @@
 
 <AccordionDrawer {show} class="playlist-drawer">
 	<div class="playlist-shell">
-		<div class="playlist-content" role="listbox" aria-label="Playlist">
+		<div
+			class="playlist-content"
+			role="listbox"
+			aria-label="Playlist"
+			aria-multiselectable="false"
+		>
 			{#each playlist as song, index}
 				<TrackListItem
 					{song}

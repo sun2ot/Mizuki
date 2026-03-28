@@ -43,7 +43,9 @@
 	}
 
 	function loadPioAssets() {
-		if (typeof window === "undefined") {return;}
+		if (typeof window === "undefined") {
+			return;
+		}
 
 		const loadScript = (src: string, id: string): Promise<void> => {
 			return new Promise((resolve, reject) => {
@@ -54,24 +56,37 @@
 				const script = document.createElement("script");
 				script.id = id;
 				script.src = src;
+				script.async = true;
 				script.onload = () => resolve();
 				script.onerror = reject;
 				document.head.appendChild(script);
 			});
 		};
 
-		loadScript("/pio/static/l2d.js", "pio-l2d-script")
-			.then(() => loadScript("/pio/static/pio.js", "pio-main-script"))
-			.then(() => {
-				setTimeout(initPio, 100);
-			})
-			.catch((error) => {
-				console.error("Failed to load Pio scripts:", error);
+		const loadWithIdle = () => {
+			loadScript("/pio/static/l2d.js", "pio-l2d-script")
+				.then(() => loadScript("/pio/static/pio.js", "pio-main-script"))
+				.then(() => {
+					setTimeout(initPio, 100);
+				})
+				.catch((error) => {
+					console.error("Failed to load Pio scripts:", error);
+				});
+		};
+
+		if ("requestIdleCallback" in window) {
+			(window as any).requestIdleCallback(loadWithIdle, {
+				timeout: 5000,
 			});
+		} else {
+			setTimeout(loadWithIdle, 2000);
+		}
 	}
 
 	onMount(() => {
-		if (!pioConfig.enable) {return;}
+		if (!pioConfig.enable) {
+			return;
+		}
 
 		if (
 			pioConfig.hiddenOnMobile &&

@@ -280,6 +280,8 @@ const jsonLd = {
 							src={entry.data.image}
 							basePath={getFileDirFromPath(entry.filePath || "")}
 							class="mb-8 rounded-xl banner-container onload-animation"
+							widths={[640, 1024, 1536, 2048]}
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
 						/>
 					</>
 				)
@@ -287,7 +289,10 @@ const jsonLd = {
 
 			{
 				isEncrypted ? (
-					<Encryptor password={entry.data.password} hint={entry.data.passwordHint}>
+					<Encryptor
+						password={entry.data.password}
+						hint={entry.data.passwordHint}
+					>
 						<Markdown class="mb-6 markdown-content onload-animation">
 							<Content />
 						</Markdown>

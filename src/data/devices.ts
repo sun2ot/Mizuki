@@ -16,6 +16,7 @@ export type DeviceCategory = Record<string, Device[]> & {
 export const devicesData: DeviceCategory = {
 	Xiaomi: [
 		{
+<<<<<<< HEAD
 			name: "小米 15",
 			image:
 				"https://img.085404.xyz/images/d02d28202a6d7230c0d8c4fd20890154.webp",
@@ -46,10 +47,19 @@ export const devicesData: DeviceCategory = {
 			specs: '1.74" AMOLED',
 			description: "高精度运动健康 睡眠呼吸暂停监测 心率血氧监测",
 			link: "https://www.mi.com/prod/xiaomi-shouhuan-9-pro",
+=======
+			name: "OnePlus 13T",
+			image: "/images/device/oneplus13t.webp",
+			specs: "Gray / 16G + 1TB",
+			description:
+				"Flagship performance, Hasselblad imaging, 80W SuperVOOC.",
+			link: "https://www.oneplus.com/cn/13t",
+>>>>>>> upstream/master
 		},
 	],
 	PC: [
 		{
+<<<<<<< HEAD
 			name: "机械革命 翼龙15Pro",
 			image:
 				"https://img.085404.xyz/images/0608ecae691f5a3643e536b1b2355cc2.webp",
@@ -72,6 +82,14 @@ export const devicesData: DeviceCategory = {
 			specs: "75%配列 / 83键 / 8000mAh",
 			description: "凯华流光冰淇淋轴 三模 热插拔",
 			link: "https://www.maicong.cn/detail?link_product=a090cf68ee4ed5de2addc68c36323371",
+=======
+			name: "GL-MT3000",
+			image: "/images/device/mt3000.webp",
+			specs: "1000Mbps / 2.5G",
+			description:
+				"Portable WiFi 6 router suitable for business trips and home use.",
+			link: "https://www.gl-inet.cn/products/gl-mt3000/",
+>>>>>>> upstream/master
 		},
 	],
 };
