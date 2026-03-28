@@ -57,13 +57,6 @@ const iconWebpSrc = hasIconPngFallback ? iconSrc.replace(/\.png$/i, ".webp") : i
 				{/* 使用navbarTitle配置或默认配置 */}
                 {siteConfig.navbarTitle ? (
                     siteConfig.navbarTitle.mode === "logo" ? (
-<<<<<<< HEAD
-                        <img src={logoSrc} alt={siteConfig.navbarTitle.text} class="h-10 md:h-13 md:in-[.enable-banner]:h-10 md:in-[.enable-banner]:group-[.scrolled]:h-13 max-w-full object-contain transition-all duration-300" loading="lazy" />
-                    ) : (
-                        <>
-                            <img src={iconSrc} alt={siteConfig.navbarTitle.text} class="h-7 w-7 mr-2 object-contain" loading="lazy" />
-                            <span>{siteConfig.navbarTitle.text}</span>
-=======
                         hasLogoPngFallback ? (
                             <picture>
                                 <source srcset={logoWebpSrc} type="image/webp" />
@@ -83,7 +76,6 @@ const iconWebpSrc = hasIconPngFallback ? iconSrc.replace(/\.png$/i, ".webp") : i
                                 <img src={iconSrc} alt="" class="h-[1.75rem] w-[1.75rem] mr-2 object-contain" loading="lazy" />
                             )}
                             <span class="dark:text-white text-black">{siteConfig.navbarTitle.text}</span>
->>>>>>> upstream/master
                         </>
                     )
                 ) : (

@@ -23,41 +23,6 @@ const style = Astro.props.style;
 	class={className}
 	style={style}
 >
-<<<<<<< HEAD
-    <div>
-        <!-- 公告栏内容 -->
-        <div class="text-75 leading-relaxed mb-3">
-            {config.content}
-        </div>
-        
-        <!-- 可选链接和关闭按钮 -->
-        <div class="flex items-center justify-between gap-3">
-            <div>
-                {config.link && config.link.enable !== false && (
-                    <a 
-                        href={config.link.url} 
-                        target={config.link.external ? "_blank" : "_self"}
-                        rel={config.link.external ? "noopener noreferrer" : undefined}
-                        class="btn-regular rounded-lg px-3 py-1.5 text-sm font-medium active:scale-95 transition-transform"
-                    >
-                        {config.link.text}
-
-                    </a>
-                )}
-            </div>
-            
-            {config.closable && (
-                <button
-                    class="btn-regular rounded-lg h-8 w-8 text-sm hover:bg-(--btn-regular-bg-hover) transition-colors"
-                    onclick="closeAnnouncement()"
-                    aria-label={i18n(I18nKey.announcementClose)}
-                >
-                    <Icon name="fa7-solid:xmark" class="text-sm" />
-                </button>
-            )}
-        </div>
-    </div>
-=======
 	<div>
 		<!-- 公告栏内容 -->
 		<div
@@ -100,7 +65,6 @@ const style = Astro.props.style;
 			}
 		</div>
 	</div>
->>>>>>> upstream/master
 </WidgetLayout>
 
 <script>
